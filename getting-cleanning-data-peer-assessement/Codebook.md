@@ -24,6 +24,8 @@ The features selected for this database come from the accelerometer and gyroscop
 
 These signals were used to estimate variables of the feature vector for each pattern:  '-XYZ' is used to denote 3-axial signals in the X, Y and Z directions.
 
+ A Fast Fourier Transform (FFT) was applied to some of these signals producing fBodyAcc-XYZ, fBodyAccJerk-XYZ, fBodyGyro-XYZ, fBodyAccJerkMag, fBodyGyroMag, fBodyGyroJerkMag. (Note the 'f' to indicate frequency domain signals). 
+ 
     tBodyAcc-XYZ
     tGravityAcc-XYZ
     tBodyAccJerk-XYZ
@@ -49,7 +51,7 @@ The set of variables that were estimated from these signals are:
 
 ## Clean Data Columns
 
-The resulting data frame has 81 columns:
+The resulting data frame has 68 columns:
 
     ActivityName : The activity performed by the subject
     SubjectId : The subject id 1:30
