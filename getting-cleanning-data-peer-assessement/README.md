@@ -1,6 +1,6 @@
 # Getting and Cleaning Data - peer assessment project
 
-##Base environment info
+## Environment info
 
 R version 3.1.3 (2015-03-09)
 
@@ -21,7 +21,7 @@ Here are the data for the project:
 In the run_analysis.R script, functions were created for each step.
 
 Function pre_setting :
-This function downloads and extract the data from the link above.
+This function downloads and extracts the data from the link above.
 Only use this function if you do not have the data in our machine
 
 Function read_data :
