@@ -85,6 +85,7 @@ tidy_data = function(file.name) {
     # Cast and get the mean 
     tidy_data <- dcast(melted.data, ActivityName + SubjectId ~ variable, mean)
     
+    # Create the file
     write.table(tidy_data, file.name)
 }
 
