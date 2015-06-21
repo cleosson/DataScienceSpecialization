@@ -53,3 +53,5 @@ To download the data, after source command run:
 and then:
 
 > tidy_data("tidy_data.txt")
+
+The tidy_data.txt is created in the working directory
