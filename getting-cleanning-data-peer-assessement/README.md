@@ -25,7 +25,8 @@ This function downloads and extract the data from the link above.
 Only use this function if you do not have the data in our machine
 
 Function read_data :
-This function is used: to read the test or train data into the R environment
+This function is used:
+*to read the test or train data into the R environment
 
 Function read_train_data :
 This function is used to read the train data into the R environment
