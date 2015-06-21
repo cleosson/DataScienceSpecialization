@@ -75,11 +75,14 @@ tidy_data = function(file.name) {
     library(reshape2)
     
     merged.data <- merge_data()
+    # The id variables
     vars.id <- c("ActivityName", "SubjectId")
+    # The measure variables
     vars.measure = setdiff(colnames(merged.data), vars.id)
+    # Melt the data
     melted.data <- melt(merged.data, id=vars.id, measure.vars=vars.measure)
 
-    # recast 
+    # Cast and get the mean 
     tidy_data <- dcast(melted.data, ActivityName + SubjectId ~ variable, mean)
     
     write.table(tidy_data, file.name)
