@@ -22,7 +22,7 @@ closeAllConnections()
 png("plot3.png", width=480, height=480)
 
 data <- mutate(data, FullDate = as.POSIXct(paste(Date, Time), format = "%d/%m/%Y %H:%M:%S"))
-with(data, plot(FullDate, Sub_metering_1, type = "n", ylab = "Energy sub metering"))
+with(data, plot(FullDate, Sub_metering_1, type = "n", xlab = "", ylab = "Energy sub metering"))
 with(data, points(FullDate, Sub_metering_1, col = "black", type = "l")) 
 with(data, points(FullDate, Sub_metering_2, col = "red", type = "l")) 
 with(data, points(FullDate, Sub_metering_3, col = "blue", type = "l")) 
