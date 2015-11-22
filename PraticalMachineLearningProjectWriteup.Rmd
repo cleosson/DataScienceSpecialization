@@ -1,0 +1,180 @@
+---
+title: "Pratical Machine Learning Writeup"
+author: "Cleosson Souza"
+date: "22 de novembro de 2015"
+output: html_document
+---
+
+Executive Summary
+-----------------
+
+The main objectives of this research is to predct the manne in which a group of enthusiasts did the exercise. A group of enthusiasts took measurements about themselves regularly to improve their health. Our goal is to use the data to predict the manner in which they did the exercise, in this case the barbell lifts.
+ The target variable is "classe" and we use the other variables to predict it.
+ The data coming from  http://groupware.les.inf.puc-rio.br/har.
+
+Data
+-----------------
+
+Download the training and test data and take a look in the data:
+
+```{r}
+training.url <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+training.filename <- "data/pml-training.csv"
+if (!file.exists(training.filename)) {
+    download.file(training.url, destfile=training.filename, method="curl")
+}
+training.data <- read.csv(training.filename)
+
+testing.url <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+testing.filename <- "data/pml-testing.csv"
+if (!file.exists(testing.filename)) {
+    download.file(testing.url, destfile=testing.filename, method="curl")
+}
+testing.data <- read.csv(testing.filename)
+
+str(training.data, list.len=15)
+```
+
+We can see the dataset has 160 variables, which is really large.
+
+Cleaning the data
+-----------------
+
+Based on the above information, we remove the columns 1 to 6, which are there just for information and reference purposes:
+
+```{r}
+training.data <- training.data[, 7:160]
+testing.data  <- testing.data[, 7:160]
+```
+
+and removing all columns that has missing values:
+
+```{r}
+columns.missing.values  <- sapply(training.data, function (x) any(is.na(x) | x == ""))
+training.data <- training.data[, !columns.missing.values]
+testing.data  <- testing.data[, !columns.missing.values]
+```
+
+Cross Validation
+----------------
+
+Now we split the training set into two for *cross validation* purposes. We randomly subsample 60% of the set for training purposes (actual model building), while the 40% remainder will be used only for testing, evaluation and accuracy measurement:
+
+```{r}
+library(caret)
+
+set.seed(1987)
+inTrain <- createDataPartition(y=training.data$classe, p=0.60, list=FALSE)
+training.data.training  <- training.data[inTrain,]
+training.data.testing  <- training.data[-inTrain,]
+dim(training.data.training)
+dim(training.data.testing)
+```
+
+Preprocessing of the data
+-------------------------
+
+To reduce the number of variables, we use *"zero covariates"* and *"principal component (PC) analysis"*.
+
+We can now identify the "zero covariates" from training.data.training and remove these “zero covariates”" from both training.data.training and training.data.testing:
+
+```{r}
+nzv.cols <- nearZeroVar(training.data.training)
+if(length(nzv.cols) > 0) {
+  training.data.training <- training.data.training[, -nzv.cols]
+  training.data.testing <- training.data.testing[, -nzv.cols]
+}
+dim(training.data.training)
+dim(training.data.testing)
+```
+
+None zero covariates were found. The removal of NA was sufficient to clean the data. We are satisfied that we now have 53 clean covariates to build a model for classe (which is the 54th column of the dataset):
+
+```{r}
+nzv.cols <- nearZeroVar(training.data.training)
+if(length(nzv.cols) > 0) {
+  training.data.training <- training.data.training[, -nzv.cols]
+  training.data.testing <- training.data.testing[, -nzv.cols]
+}
+dim(training.data.training)
+dim(training.data.testing)
+```
+
+Now we use the PC analysis keeping 95% of the variability, and put back the classes:
+
+```{r}
+library(dplyr)
+
+numTraining <- select(training.data.training, -classe)
+preProcPC <- preProcess(numTraining, method=c("pca"), thresh=0.95)
+training.data.training.PC <- preProcPC %>%
+  predict(numTraining) %>%
+  mutate(classe=training.data.training$classe)
+
+```
+
+Using the Random Forest
+-----------------------
+
+We now use the main classification algorithm: the random forest.
+
+```{r}
+library(randomForest)
+
+set.seed(1987)
+PCForestFit <- randomForest(classe~., data=training.data.training.PC, importance=TRUE, ntree=100)
+varImpPlot(PCForestFit)
+
+```
+
+Accuracy predictions
+--------------------
+With the model PCForestFit, we need to evaluate the accuracy. We are going to use the testing subset (training.data.testing) and assume all the outcome are equiprobable:
+
+```{r}
+PCtesting <- predict(preProcPC, select(training.data.testing, -classe))
+predPCForest <- predict(PCForestFit, PCtesting)
+confusionForest <- confusionMatrix(predPCForest, training.data.testing$classe, prevalence=c(A=0.2, B=0.2, C=0.2, D=0.2, E=0.2))
+print(confusionForest)
+```
+
+We have an accuracy of 96.83%, which is very good.
+
+```{r}
+confusionForest$overall[c("Accuracy", "AccuracyLower", "AccuracyUpper")]
+```
+
+It is expected an small out-of-sample error because of the small size of the dataset.
+The out-of-sample error rate: 0.0317 or 3.17%
+
+Coursera Submission
+-------------------
+
+We predict the classification of the 20 observations of the testing data set for Coursera’s “Course Project: Submission” challenge page:
+
+```{r}
+testing.data.predict <- predict(preProcPC, testing.data)
+testing.data.predict$classe <- predict(PCForestFit, testing.data.predict)
+print(data.frame(problem_id = testing.data.predict$problem_id, classe = testing.data.predict$classe))
+````
+
+We create one .CSV file with all the results, presented in two columns (named problem_id and classe) and 20 rows of data:
+
+```{r}
+submit <- data.frame(problem_id = testing.data.predict$problem_id, classe = testing.data.predict$classe)
+write.csv(submit, file = "coursera-submission.csv", row.names = FALSE)
+```
+
+And we create twenty .TXT file that we will upload one by one in the Coursera website (the 20 files created are called problem_1.txt to problem_20.txt):
+
+```{r}
+answers = testing.data.predict$classe
+write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_",i,".txt")
+    write.table(x[i], file=filename, quote=FALSE, row.names=FALSE, col.names=FALSE)
+  }
+}
+write_files(answers)
+```
