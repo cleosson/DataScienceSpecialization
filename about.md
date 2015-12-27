@@ -11,6 +11,6 @@ Second, you can choose some caractheristcs of the cars that you desire: Cylinder
 
 The table will show only the cars with the filters selected. You can sort the table according to the variable you want by clicking the arrows at the top of the table.
 
-The plot show the best three cars.
+The plot shows the best three cars.
 
 Source code for ui.R and server.R files are available on the [GitHub](https://github.com/cleosson/DevelopingDataProductsProject).
