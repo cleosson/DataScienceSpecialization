@@ -13,4 +13,4 @@ The table will show only the cars with the filters selected. You can sort the ta
 
 The plot show the best three cars.
 
-Source code for ui.R and server.R files are available on the [GitHub](https://github.com/raencinas/dataproducts).
+Source code for ui.R and server.R files are available on the [GitHub](https://github.com/cleosson/DevelopingDataProductsProject).
