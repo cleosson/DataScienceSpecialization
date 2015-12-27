@@ -2,6 +2,7 @@
 # ui.R file for the shiny app
 
 library(shiny)
+library(markdown)
 
 shinyUI(
     navbarPage(
