@@ -13,6 +13,12 @@ to predict subsequent words.
 
 ![Algorithm](https://raw.githubusercontent.com/cleosson/data-science-capstone/master/presentation/images/algorithm_flow.png)
 
+### Folder structure
+
+- code: R code to create the hash_table.rda file used by Shiny app. To create hash_table.rda, use build_base.R and build_hashtable.R
+- shiny-app: The shiny application code
+- presentation: A slide deck [presentation](http://rpubs.com/cleosson/DataScienceCapstone)
+
 ### Shiny App
 If you haven't tried out the app, go [here](https://cleosson.shinyapps.io/DataScienceCapstone/) to try it.
 
@@ -21,7 +27,7 @@ If you haven't tried out the app, go [here](https://cleosson.shinyapps.io/DataSc
 - Make prediction as you type
 
 
-### Main Feature: Speed
+### Main Feature
 - The underlying code stores the n-gram into a hash table, where the words entered by the user are the key and the next word is the value in the hash table
 - The hash table is a enclosing environment (new.env)
 - "Stupid Backoff" is designed for scale. We're restricted to 100mb on ShinyApps.

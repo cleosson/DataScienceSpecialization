@@ -1,7 +1,7 @@
-Data Science Capstone -  SwiftKey Data Product - Mobile Typing Prediction
+Data Science Capstone -  SwiftKey Data Product - Word Prediction
 ========================================================
 author: Cleosson Souza
-date: 23 April 2016
+date: 24 April 2016
 transition: rotate
 class: illustration
 rtl: false

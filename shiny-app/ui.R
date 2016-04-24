@@ -63,7 +63,9 @@ shinyUI(navbarPage("Data Science Capstone by Cleosson Souza",
                             hr(),
                             a(img(src = "algorithm_flow.png"))),
                    tabPanel("Reports",
-                            a("Milestone Report", href="https://github.com/cleosson/data-science-capstone/blob/master/reports/CourseraDataScienceCapstone.Rmd")
+                            a("Milestone Report", href="https://github.com/cleosson/data-science-capstone/blob/master/reports/CourseraDataScienceCapstone.Rmd"),
+                            br(),
+                            a("Final Report", href="http://rpubs.com/cleosson/DataScienceCapstone")
                    )
 )
 )
