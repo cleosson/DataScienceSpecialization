@@ -1,8 +1,8 @@
 name: DataScienceCapstone
 account: cleosson
 server: shinyapps.io
-bundleId: 431578
+bundleId: 431611
 url: https://cleosson.shinyapps.io/DataScienceCapstone/
-when: 1461488080.26344
+when: 1461490424.01484
 asMultiple: FALSE
 asStatic: FALSE

@@ -1,6 +1,3 @@
-rm(list=ls())
-setwd('/Users/cjps/Programming/tools/R/WorkingDirectory/DataScienceCapstone/shiny-app')
-
 ###
 ### Load Libraries
 ###

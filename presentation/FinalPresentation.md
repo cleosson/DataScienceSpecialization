@@ -16,9 +16,11 @@ Overview
 
 If you haven't tried out the app, go [here](https://cleosson.shinyapps.io/DataScienceCapstone/) to try it!
 
-- Predicts next word
-- Shows you top other possibilities
 - Make prediction as you type
+- Enter the text in the left panel and see the sentence typed, the predictions in the right panel
+- Adjust the number of predicted words
+
+<div style="align:center"><img src="images/app.png" alt="App interface" /></div>
 
 Algorithm
 ========================================================

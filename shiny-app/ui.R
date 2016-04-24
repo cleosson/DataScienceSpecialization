@@ -47,7 +47,7 @@ shinyUI(navbarPage("Data Science Capstone by Cleosson Souza",
                                        wellPanel(span(h5(textOutput('others')),style = "color:#2b8c1b")),
                                        hr(),
                                        
-                                       p('More details of the prediction algorithm and source codes', code("server.R"), code("ui.R"), code("predict.R"), code("build_base.R"), code("load_base.R"), 'can be found at', a("Data Science Capstone.",href="https://github.com/cleosson/data-science-capstone"))
+                                       p('More details of the prediction algorithm and source codes', code("server.R"), code("ui.R"), code("predict.R"), code("build_base.R"), code("build_hashtable.R"), 'can be found at', a("Data Science Capstone.",href="https://github.com/cleosson/data-science-capstone"))
                                 )
                             )
                    ),
