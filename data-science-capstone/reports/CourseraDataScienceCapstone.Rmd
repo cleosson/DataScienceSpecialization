@@ -1,0 +1,234 @@
+---
+title: "DataScience Capstone Project - Milestone Report"
+author: "Cleosson Souza"
+date: "March 20th 2016"
+output: html_document
+---
+
+#Executive Summary
+
+ This report is part of Johns Hopkins University-Coursera Data Science Capstone Project. The goal of the project is to build a predictive text model combined with a Shiny app UI that will predict the next word as the user types a sentence similar to the way most smart phone keyboards are implemented today using the technology of Swiftkey.
+ In this report we are going to show the basic information about the data from a corpus called [HC Corpora](www.corpora.heliohost.org).  
+ We are going to build n-gram that is a probability distribution over a sequency of words for predicting the next item in a sequency in the form (n -1).
+ 
+#The data and basic information
+
+ We are going to download the Coursera-SwiftKey.zip and unzip it, if needed. 
+ We are going to work with “US” training data.  
+
+```{r, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(quanteda)
+library(wordcloud)
+
+set.seed(1978)
+
+zipfile <- "data/Coursera-SwiftKey.zip"
+url <- "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip"
+us_blogs <- "data/final/en_US/en_US.blogs.txt"
+us_twitter <- "data/final/en_US/en_US.twitter.txt"
+us_news <- "data/final/en_US/en_US.news.txt"
+
+# Check for data file and unzip if necessary
+if (!file.exists(us_blogs)) {
+    # Check for zip file and download if necessary
+    if (!file.exists(zipfile)) {
+        download.file(url, destfile = zipfile)
+    }
+    
+    unzip(zipfile, exdir = "data")
+}
+```
+
+ The basic information about the files using shell command "ls"" and "wc":
+ 
+File Name File    | Size  | Line Count | Word Count
+----------------- | ----- | ---------- | ------------
+en_US.news.txt    | 196MB | 1,010,242  | 34,372,720
+en_US.twitter.txt | 159MB | 2,360,148  | 30,374,206
+en_US.blogs.txt   | 200MB | 899,288    | 37,334,690
+
+ Given the large amount of text and limited computational resources, sampling is performed.  
+ Read 20.000 lines per file, randomly sample (size 20,000) from these lines and saved to disk.  
+
+```{r}
+number_of_lines = 20000
+sample_size = 20000
+lines_blogs <- readLines(us_blogs, n = number_of_lines, encoding = 'UTF-8')
+lines_news <- readLines(us_news, n = number_of_lines,  encoding = 'UTF-8')
+lines_twitter <- readLines(us_twitter, n = number_of_lines,  encoding = 'UTF-8')
+sample_lines <- sample(paste(lines_blogs, lines_news, lines_twitter), size = sample_size)
+
+rm(lines_blogs, lines_news, lines_twitter)
+```
+
+#Create and Clean the Corpus
+
+ We are going to create a corpus, a large collection of data from the sampling of last step.
+ We are going to remove punctuation, separators, twitter # and @ from corpus.  
+ After that, we are going to create to create the language model n-grams.
+ Using the n-gram we can explore word frequencies.  
+ We do not remove the stopwords and do not stemming the words. As the target is a prediction model.   
+ 
+```{r}
+# Creating document
+document <- corpus(sample_lines)
+
+# Function to create the N-Grams
+create_ngram <- function (doc, n = 1) {
+    # n-gram
+    ngram <- dfm(doc, toLower = TRUE, removeNumbers = TRUE, removePunct = TRUE, removeSeparators = TRUE, removeTwitter = TRUE, ngrams = n)
+    # sum
+    ngram_sum <- colSums(ngram)
+    ngram_dataframe <- data.frame(names(ngram_sum), ngram_sum, row.names = NULL, check.rows = FALSE, check.names = FALSE, stringsAsFactors = FALSE)
+    # set the colunm names
+    colnames(ngram_dataframe) <- c("word", "freq")
+    # create the dataframe
+    ngram_dataframe <- mutate(ngram_dataframe, word = gsub("_", " ", word))
+    # add percentage
+    total <- sum(ngram_sum)
+    ngram_dataframe <- mutate(ngram_dataframe, percentage = ngram_dataframe$freq / total)
+    ngram_dataframe
+}
+
+# n-gram 1
+ngram1_dataframe <- create_ngram(document, 1)
+# n-gram 2
+ngram2_dataframe <- create_ngram(document, 2)
+# n-gram 3
+ngram3_dataframe <- create_ngram(document, 3)
+```
+
+
+#Exploratory Data Analysis
+
+ Now with ngrams we can do an exploratory analysis.  
+ Unigrams - Top 5 highest frequencies.  
+ 
+```{r}
+head(ngram1_dataframe[order(ngram1_dataframe[,"freq"], decreasing = TRUE),])
+```
+
+ Bigrams - Top 5 highest frequencies
+ 
+```{r}
+head(ngram2_dataframe[order(ngram2_dataframe[,"freq"], decreasing = TRUE),])
+```
+
+ Trigrams - Top 5 highest frequencies
+ 
+```{r}
+head(ngram3_dataframe[order(ngram3_dataframe[,"freq"], decreasing = TRUE),])
+```
+
+#Explore Frequencies
+
+ In the diagrams below, you can explore the n-grams by frequencies.  
+ Top 30 unigrams  
+
+```{r}
+head(ngram1_dataframe[order(ngram1_dataframe[,"freq"], decreasing = TRUE),],30) %>% 
+    ggplot(aes(word, freq)) +
+    geom_bar(stat = "identity") +
+    ggtitle("Top 30 unigrams") +
+    xlab("Unigrams") + ylab("Frequency") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+ Top 30 bigrams  
+
+```{r}
+head(ngram2_dataframe[order(ngram2_dataframe[,"freq"], decreasing = TRUE),],30) %>%
+    ggplot(aes(word, freq)) +
+    geom_bar(stat = "identity") +
+    ggtitle("Top 30 biigrams") +
+    xlab("Bigrams") + ylab("Frequency") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+ Top 30 trigrams  
+
+```{r}
+head(ngram3_dataframe[order(ngram3_dataframe[,"freq"], decreasing = TRUE),],30) %>%
+    ggplot(aes(word, freq)) +
+    geom_bar(stat = "identity") +
+    ggtitle("Top 30 trigrams") +
+    xlab("Trigrams") + ylab("Frequency") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+ Wordcloud - Top 50 Unigrams  
+ 
+```{r}
+wordcloud(ngram1_dataframe[,"word"], ngram1_dataframe[,"freq"], max.words=50, scale=c(5, .1), colors=brewer.pal(6, "Dark2"))
+```
+
+ Wordcloud - Top 50 Bigrams  
+ 
+```{r}
+wordcloud(ngram2_dataframe[,"word"], ngram2_dataframe[,"freq"], max.words=50, scale=c(5, .1), colors=brewer.pal(6, "Dark2"))
+```
+
+ Wordcloud - Top 50 Trigrams  
+ 
+```{r}
+wordcloud(ngram3_dataframe[,"word"], ngram3_dataframe[,"freq"], max.words=50, scale=c(5, .1), colors=brewer.pal(6, "Dark2"))
+```
+
+#Conclusion
+ 
+ Given the limited storage space of the Shiny application environment:
+ 
+*It is not possible to store all n-gram information for the word prediction application. 0,5% (20 thousand from +- 4 billions of lines) of the data from raw corpus, we have around 1,3 millions of trigrams.
+*It is important to omit less frequent n-grams
+*It is necessary to efficiently store only the most important n-gram information
+*It is necessary to have an efficient/fast access of stored information
+*It is important to develop a good model that combines the n-gram information for optimal word prediction
+ Number of trigrams. 
+```{r}
+nrow(ngram3_dataframe)
+```
+
+#Next Steps
+
+##General
+
+* Four-gram seems to be unfeasible. It will demand a lot of resources.  
+* Validate the model using the testing dataset
+* Profanity filtering was not included in the preliminary processing but will be included in the prediction model.
+
+##Improved Data Preprocessing and Cleaning
+ The occurance of unusual tokens in the n-gram data illustrates the importance of data cleaning and preprocessing.
+
+
+##More efficient storage of n-grams
+ To guarantee a good performance of the final word prediction application, it is necessary to store the most important n-grams for efficient/fast access. Some aspects are:
+
+* Coverage analysis
+* Removing of less frequent n-grams, i.e. frequency below a given threshold
+* Dividing each n-gram in two parts: preceeding words (n-1) and last (to be predicted) word
+* Usage of R data.tables instead of data,frames
+
+##Prediction Model
+ The model to be developed should predict the next word of an arbitrary text. The model should calculate the word prediction as a weighted combination of the predictions of four-grams, trigrams, bigrams, and unigram information. The weights have to be trained on a suitable training-set, obtained from the text corpus. Various algorithms should be explored to enhance the prediction accuracy.
+
+Planned prediction algorithms:
+
+* Search the last 1 to 3 words of the input text in the stored n-grams (preceeding part) and retrieve the top-5 last words (according to n-gram frequency).
+* Use a weighted combination of the predicted words of bigrams, trigrams, and four-grams.
+If not found, estimate the probability of unobserved n-grams
+
+Questions:
+
+* Should the model use special symbols for sentence start and stop?
+* Should the model be able to predict the end of a sentence?
+* Should the model be able to predict profane words?
+* Should the model also use skip-grams?
+
+ Skip-grams are a generalization of n-grams in which the words need not be consecutive, but may leave gaps that are skipped over. They provide one way of overcoming the data sparsity problem found with conventional n-gram analysis (Wikipedia: n-gram).
+
+##Shiny App
+The final Shiny application should comprise a user interface in which the user can type words (part of a sentence), and the application should predict the next word.
+
+The input text should be tokenized and preprocesses and the last (up to 3) words should be used to predict the most probable next word on the basis of the stored n-gram frequency tables and the word prediction model.
