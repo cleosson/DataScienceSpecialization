@@ -1,0 +1,46 @@
+---
+title       : Developing Data Products
+subtitle    : Course Project Part 2
+author      : Cleosson Souza
+job         : 
+framework   : revealjs        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : zenburn  # {highlight.js, prettify, highlight}
+--- 
+
+## Developing Data Products
+### Course Project Part 2
+----
+#### Cleosson Souza
+
+---
+
+## INTRODUCTION
+This presentation is part of the Course Project for the Coursera Developing Data Products class. The assignment has two parts. First, we need to create a Shiny application and deploy it on Rstudio's servers. Second, we should use Slidify or Rstudio Presenter to prepare a reproducible pitch presentation about the application. This presentation adresses the second part of the course project.
+The app developed for the first part of the assignment is avalilable at:
+[here](https://cleosson.shinyapps.io/DevelopingDataProducts)<br />
+Source code for ui.R and server.R files are available on the GitHub:
+[here](https://github.com/cleosson/DevelopingDataProductsProject)
+
+---
+
+## SELECT THE BEST CAR FOR YOUR TRIP APP
+This app helps you to choose a car for a trip, using the mtcars dataset from [R].
+First, you need to inform the distance of your trip and the price of gasoline in your region. These information will be used to calculate the Gasoline Costs for each car in the dataset. Second, you can choose some caractheristcs of the cars that you desire: Cylinders, Gears, Carburetors, Horse Power and Transmission. The table will show only the cars with the filters selected. You can sort the table according to the variable you want by clicking the arrows at the top of the table. The plot shows the best three cars.
+
+---
+
+## MTCARS DATASET
+The data used in the app comes from the Motor Trend Car Road Tests (mtcars) dataset. The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973-74 models). We can look to some carachteristics of the data:
+
+```{r}
+head(mtcars)
+```
+
+---
+
+## PLOT
+Here we can see the correlation among the variables of mtcars.
+```{r}
+library(car)
+pairs(mtcars, panel = panel.smooth, main = "MTCARS data")
+```
