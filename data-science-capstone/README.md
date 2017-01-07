@@ -11,7 +11,7 @@ to predict subsequent words.
 - Checks if highest-order (in this case 4) n-gram has been seen. If not "degrades" to a lower-order model (3, 2); we would use even higher orders, but ShinyApps caps app size at 100mb
 - A simplified view of it is below
 
-![Algorithm](https://raw.githubusercontent.com/cleosson/data-science-capstone/master/presentation/images/algorithm_flow.png)
+![Algorithm](https://raw.githubusercontent.com/cleosson/DataScienceSpecialization/data-science-capstone/master/presentation/images/algorithm_flow.png)
 
 ### Folder structure
 
